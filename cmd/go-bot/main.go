@@ -1,11 +1,11 @@
 package main
 
 import (
+	"fmt"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
-
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 func main() {
@@ -34,14 +34,22 @@ func main() {
 		if update.Message != nil { // If we got a message
 			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 
-			if update.Message.Command() == "help" {
+			switch update.Message.Command() {
+			case "help":
 				helpCommand(update.Message, bot)
-				continue
+			case "hello":
+				helloCommand(update.Message, bot)
+			default:
+				defaultMessage(update.Message, bot)
 			}
-
-			defaultMessage(update.Message, bot)
 		}
 	}
+}
+
+func helloCommand(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
+	msg := tgbotapi.NewMessage(message.Chat.ID, fmt.Sprintf("Hello, %s!", message.From.UserName))
+
+	bot.Send(msg)
 }
 
 func defaultMessage(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
